@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Passo 1: Checkout do repositório
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Passo 2: Configuração do Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16  # Altere para a versão desejada
+
+      # Passo 3: Instalar dependências
+      - name: Install dependencies
+        run: npm install
+
+      # Passo 4: Verificar se o `package.json` existe
+      - name: Check for package.json
+        run: |
+          if [ ! -f package.json ]; then
+            echo "package.json not found. Please ensure it exists in the repository root."
+            exit 1
+          fi
+
+      # Passo 5: Rodar os testes
+      - name: Run tests
+        run: npm test
+
+      # Passo 6 (Opcional): Rodar linter
+      - name: Run linter
+        run: npm run lint
+        continue-on-error: true  # Permite que o linter falhe sem quebrar o workflow
