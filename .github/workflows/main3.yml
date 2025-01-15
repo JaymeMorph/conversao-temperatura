@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Passo 1: Checkout do repositório
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Passo 2: Verificar se package.json existe no diretório src
+      - name: Verify package.json exists in src
+        run: |
+          if [ ! -f src/package.json ]; then
+            echo "Error: package.json not found in the src directory."
+            echo "Ensure the file exists at src/package.json and try again."
+            exit 1
+          fi
+
+      # Passo 3: Configuração do Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16  # Ajuste para a versão do Node.js que você utiliza
+
+      # Passo 4: Navegar para o diretório src e instalar dependências
+      - name: Install dependencies
+        working-directory: src
+        run: npm install
+
+      # Passo 5: Rodar os testes no diretório src
+      - name: Run tests
+        working-directory: src
+        run: npm test
+
+      # Passo 6 (Opcional): Rodar linter no diretório src
+      - name: Run linter
+        working-directory: src
+        run: npm run lint
+        continue-on-error: true  # Permite erros no linter sem interromper o workflow
